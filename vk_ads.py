@@ -3,7 +3,7 @@ import csv
 import pandas as pd
 import matplotlib.pyplot as plt
 
-token = '451a4fe3e879c46a5b879dc41a78962a02419827a12aab22ce132810fa6c677f7ba80660ddb54d2819876'
+token = ''
 
 session = vk_api.VkApi(token=token)
 vk = session.get_api()
