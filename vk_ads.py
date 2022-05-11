@@ -2,6 +2,7 @@ import vk_api
 import csv
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 token = '451a4fe3e879c46a5b879dc41a78962a02419827a12aab22ce132810fa6c677f7ba80660ddb54d2819876'
 
@@ -51,34 +52,35 @@ def data_preparation(campaigns):
     return df
 
 # Отображение графика
-def show_graphic(df):
+def show_graphic():
+    df = pd.read_csv('df.csv')
+    print(df)
     accounts = df.account_id.unique()
     plt.subplots(2, 1)
+    plt.style.use('seaborn')
     plt.figure(figsize=(6, 6))
-
     plt.subplot(211)
     for account in accounts:
         y = df[df.account_id == account]["spent"].to_numpy()
         x = df[df.account_id == account]["day"].to_numpy()
         plt.plot(x, y, label=f"РК: {account}")
+        #plt.xticks([::5], y[::5], fontsize=7)
 
-    plt.title('График затрат:')
     plt.ylabel('Затраты (руб.)')
-    plt.xlabel('Дни')
-    plt.xticks(rotation=75)
     plt.legend()
 
     plt.subplot(212)
     for account in accounts:
         y = df[df.account_id == account]["clicks"].to_numpy()
         x = df[df.account_id == account]["day"].to_numpy()
-        plt.plot(x, y, label=f"РК: {account}")
+        plt.plot(x, y, linestyle='--')
 
-    plt.title('График кликов:')
-    plt.ylabel('Клики (руб.)')
+    plt.ylabel('Клики')
     plt.xlabel('Дни')
-    plt.xticks(rotation=75)
-    plt.legend()
+
+
+    plt.subplots_adjust(wspace=0, hspace=0.05)
+    plt.style.use('seaborn')
     plt.show()
 
 
@@ -88,8 +90,7 @@ def show_graphic(df):
 #campaigns = get_campaigns(id)
 #ads = get_ads_account(id, campaigns, date_start, date_end)
 #data_frame = data_preparation(ads)
-data_frame = pd.read_csv('df.csv')
-show_graphic(data_frame)
+show_graphic()
 
 
 
