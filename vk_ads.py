@@ -3,6 +3,8 @@ import csv
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import json
+import numpy as np
 
 token = '451a4fe3e879c46a5b879dc41a78962a02419827a12aab22ce132810fa6c677f7ba80660ddb54d2819876'
 
@@ -14,13 +16,27 @@ def get_campaigns(id):
     camp = vk.ads.getCampaigns(account_id=id)
     return camp
 
+def get_ads(id, campaigns):
+    lst = []
+    arr = []
+    campaign_list = json.dumps([i['id'] for i in campaigns])
+    ads = vk.ads.getAds(account_id=id, campaign_ids=campaign_list, include_deleted=0)
+
+    for ad in ads:
+        # lst.append([ad['id'], ad['campaign_id'], ad['day_limit']])
+        arr.append({'id': ad['id'], 'campaign_id': ad['campaign_id'], 'day_limit': ad['day_limit']})
+
+    # df = pd.DataFrame(lst, columns=['id', 'campaign_id', 'day_limit'])
+    return arr
+
+
 # Для каждой рекламной кампании выгружаем статистику
-def get_ads_account(id, campaign, date_start, date_end):
+def get_stat(id, campaign, date_start, date_end, ids_type) -> list:
     new_data = []
 
     for c in campaign:
         new_data.append(vk.ads.getStatistics(account_id=id,
-                                        ids_type='campaign',
+                                        ids_type=ids_type,
                                         ids=c['id'],
                                         period='day',
                                         date_from=date_start,
@@ -28,7 +44,7 @@ def get_ads_account(id, campaign, date_start, date_end):
     return new_data
 
 
-def data_preparation(campaigns):
+def data_preparation(campaigns, ids_type):
     arr = []
     for campaign in campaigns:
         # Создаём DataFrame со статистикой каждой кампании
@@ -48,7 +64,7 @@ def data_preparation(campaigns):
     df = pd.concat(arr)
     df = df.fillna(0)
     df.index.names = ['day']
-    df.to_csv('df.csv')
+    df.to_csv(f"{ids_type}.csv")
     return df
 
 # Отображение графика
@@ -84,13 +100,16 @@ def show_graphic():
     plt.show()
 
 
-#id = 1607207085
-#date_start = '2022-01-18'
-#date_end = '2022-02-27'
-#campaigns = get_campaigns(id)
-#ads = get_ads_account(id, campaigns, date_start, date_end)
-#data_frame = data_preparation(ads)
+id = 1607207085
+date_start = '2022-01-18'
+date_end = '2022-02-27'
+campaigns = get_campaigns(id)
+ads = get_ads(id, campaigns)
+campaign_stat = get_stat(id, campaigns, date_start, date_end, ids_type='campaign')
+ads_stat = get_stat(id, ads, date_start, date_end, ids_type='ad')
+
+campaigns_frame = data_preparation(campaign_stat, ids_type='campaign')
+ads_frame = data_preparation(ads_stat, ids_type='ad')
+df = pd.read_csv('df.csv')
+print(df)
 show_graphic()
-
-
-
