@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 import json
 import numpy as np
 
-token = 'Сюда нужно вставить токен'
+token = #Сюда нужно вставить токен
 
 session = vk_api.VkApi(token=token)
 vk = session.get_api()
@@ -23,10 +23,8 @@ def get_ads(id, campaigns):
     ads = vk.ads.getAds(account_id=id, campaign_ids=campaign_list, include_deleted=0)
 
     for ad in ads:
-        # lst.append([ad['id'], ad['campaign_id'], ad['day_limit']])
         arr.append({'id': ad['id'], 'campaign_id': ad['campaign_id'], 'day_limit': ad['day_limit']})
-
-    # df = pd.DataFrame(lst, columns=['id', 'campaign_id', 'day_limit'])
+        
     return arr
 
 
